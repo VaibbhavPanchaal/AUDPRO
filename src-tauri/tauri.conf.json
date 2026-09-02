@@ -1,0 +1,50 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Conversation Summarizer",
+  "version": "0.1.0",
+  "identifier": "com.example.mytauriapp",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:1420"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [
+      {
+        "title": "Offline Speech Intelligence",
+        "width": 1280,
+        "height": 860,
+        "minWidth": 980,
+        "minHeight": 640,
+        "resizable": true,
+        "fullscreen": false,
+        "decorations": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "category": "Utility",
+    "icon": [
+      "icons/icon.png"
+    ],
+    "externalBin": [
+      "binaries/audio-processor"
+    ],
+    "resources": [],
+    "macOS": {
+      "minimumSystemVersion": "13.0"
+    },
+    "windows": {
+      "webviewInstallMode": {
+        "type": "embedBootstrapper"
+      }
+    }
+  }
+}

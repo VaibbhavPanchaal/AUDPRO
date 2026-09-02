@@ -1,0 +1,52 @@
+:root {
+    --primary-color: #4A90E2;
+    --secondary-color: #50E3C2;
+    --background-color: #F5F5F5;
+    --text-color: #333333;
+    --border-color: #E0E0E0;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--primary-color);
+}
+
+button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: var(--secondary-color);
+}
+
+.panel {
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.recording-status {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.history-directory {
+    margin-top: 20px;
+    max-height: 300px;
+    overflow-y: auto;
+}

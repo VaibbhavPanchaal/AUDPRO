@@ -1,0 +1,30 @@
+# --- Dependencies / build outputs ---
+node_modules/
+dist/
+target/
+*.log
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+build/
+*.spec.bak
+
+# --- Heavy local artifacts (regenerate on Windows) ---
+# PyInstaller onedir distribution
+python-sidecar/dist/
+python-sidecar/build/
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/settings.json
+.idea/
+*.swp
+
+# --- Platform binaries (generate per-target; commit only source) ---
+src-tauri/binaries/
+/audio-processor-x86_64-apple-darwin.spec

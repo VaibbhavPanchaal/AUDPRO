@@ -1,0 +1,35 @@
+# python-sidecar/requirements.txt
+# Offline speech intelligence sidecar — Python 3.11
+#
+# IMPORTANT (air-gap invariant):
+#   After `pip install -r requirements.txt`, no runtime step may contact
+#   the network. All model weights must be placed under ./models/ by hand
+#   (or by a one-time provisioning script run BEFORE deployment).
+
+# --- Transcription: WhisperX batched inference on CTranslate2 ------------
+whisperx
+ctranslate2>=4.0.0
+
+# --- Torch stack (CUDA 12.4 wheels) --------------------------------------
+# On Windows with NVIDIA GPUs:
+#   pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu124
+# The line below is the CPU/cross-platform fallback used on build machines
+# without NVIDIA toolchains; the Windows build step overrides it.
+torch
+torchaudio
+
+# --- Speaker diarization --------------------------------------------------
+pyannote.audio>=3.1.0
+
+# --- In-process LLM summarization (no server, embedded llama.cpp) ---------
+llama-cpp-python
+
+# --- Audio I/O and numerics -----------------------------------------------
+# NOTE: numpy is pinned <2 because the torch 2.x wheels are compiled against
+# the NumPy 1.x C ABI; numpy 2.x breaks torch's numpy interop at import.
+soundfile
+scipy
+numpy<2
+
+# --- Packaging -------------------------------------------------------------
+pyinstaller
