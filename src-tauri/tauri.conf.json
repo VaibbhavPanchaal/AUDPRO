@@ -24,7 +24,15 @@
       }
     ],
     "security": {
-      "csp": null
+      "csp": null,
+      "assetProtocol": {
+        "enable": true,
+        "scope": [
+          "$APPDATA/**",
+          "$RESOURCE/**",
+          "$HOME/**"
+        ]
+      }
     }
   },
   "bundle": {
@@ -38,7 +46,8 @@
       "../python-sidecar/dist/audio-processor-x86_64-apple-darwin/": "sidecar/"
     },
     "macOS": {
-      "minimumSystemVersion": "13.0"
+      "minimumSystemVersion": "13.0",
+      "infoPlist": "./Info.plist"
     },
     "windows": {
       "webviewInstallMode": {

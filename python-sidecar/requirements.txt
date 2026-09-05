@@ -24,6 +24,12 @@ torchaudio
 # --- Speaker diarization --------------------------------------------------
 pyannote.audio>=3.1.0
 
+# --- Transformers (ALIGNMENT CRITICAL, macOS Intel hard lock) -------------
+# torch on Intel Macs caps at 2.2.2 (PyTorch dropped macOS x86_64 wheels
+# after 2.2). transformers 5.x REQUIRES torch>=2.5 and silently DISABLES
+# PyTorch otherwise -> Wav2Vec2 alignment + Pyannote would break. Pin <5.
+transformers>=4.41,<5
+
 # --- In-process LLM summarization (no server, embedded llama.cpp) ---------
 llama-cpp-python
 
