@@ -1,89 +1,45 @@
-# Desktop Conversation Summarizer
+# AUDPRO — Offline Speech Intelligence
 
-This project is a fully local Desktop Conversation Summarizer that transcribes multi-speaker conversations in Gujarati, Hindi, and English (including Hinglish/Gujlish code-switching) and outputs structured Markdown summaries.
+Tauri v2 desktop app: native audio capture (Rust/cpal) -> frozen Python
+sidecar (WhisperX -> Wav2Vec2 alignment -> Pyannote 3.1 diarization ->
+in-process GGUF summarization) over a strict stdin/stdout NDJSON protocol.
+Fully air-gapped at runtime.
 
-## Key Features
+## Platform tracks
 
-- **Multi-Speaker Transcription**: Supports transcription of conversations with multiple speakers.
-- **Language Support**: Handles Gujarati, Hindi, English, and code-switching between these languages.
-- **Structured Output**: Generates Markdown summaries for easy readability and organization.
+| | Windows x64 | macOS Intel |
+|---|---|---|
+| Audio API | WASAPI (cpal) | CoreAudio (cpal) |
+| Compute | CUDA 12.4 (CPU+INT8 fallback) | CPU + INT8 (no CUDA on Intel Macs) |
+| Sidecar build kit | `python-sidecar/build-windows.ps1` | `python-sidecar/build-mac-intel.sh` |
+| PyInstaller spec | `python-sidecar/audio_sidecar.spec` | `python-sidecar/audio_sidecar_macos.spec` |
+| Installer | NSIS `.exe` | `.app` / `.dmg` |
 
-## Technical Stack
-
-- **Desktop Core**: Built with Tauri v2 (Rust) for managing audio capture and subprocess IPC.
-- **Frontend**: Utilizes Vite + React + Tailwind CSS for a responsive user interface.
-- **Backend Sidecar**: A bundled Python binary running:
-  - `faster-whisper` for optimized transcription.
-  - `pyannote.audio` for speaker diarization.
-  - Integration with an Ollama LLM for enhanced summarization.
-
-## Project Structure
+## Quick start (macOS Intel)
 
 ```
-my-tauri-app
-├── src
-│   ├── App.tsx
-│   ├── main.tsx
-│   ├── styles.css
-│   └── components
-│       └── recorder-panel.tsx
-├── src-tauri
-│   ├── Cargo.toml
-│   ├── tauri.conf.json
-│   ├── src
-│   │   ├── lib.rs
-│   │   ├── main.rs
-│   │   ├── audio
-│   │   │   ├── mod.rs
-│   │   │   ├── recorder.rs
-│   │   │   └── wav_writer.rs
-│   │   ├── commands
-│   │   │   └── audio.rs
-│   │   └── state
-│   │       └── app_state.rs
-├── package.json
-├── vite.config.ts
-├── tailwind.config.js
-├── tsconfig.json
-├── index.html
-├── .gitignore
-└── README.md
+npm install && npm run build
+cd python-sidecar && bash build-mac-intel.sh   # gates + freeze + stage
+cd ../src-tauri && npm run tauri build         # .app + .dmg
 ```
 
-## Setup Instructions
+## Quick start (Windows x64)
 
-1. **Clone the Repository**:
-   ```bash
-   git clone <repository-url>
-   cd my-tauri-app
-   ```
+```
+npm install
+cd python-sidecar
+powershell -ExecutionPolicy Bypass -File build-windows.ps1
+cd ..\src-tauri && npm run tauri build
+```
 
-2. **Install Dependencies**:
-   - For the frontend:
-     ```bash
-     npm install
-     ```
-   - For the backend (Rust):
-     ```bash
-     cd src-tauri
-     cargo build
-     ```
+## Model weights (provision locally, never downloaded at runtime)
 
-3. **Run the Application**:
-   ```bash
-   npm run tauri dev
-   ```
+`python-sidecar/models/{whisper/medium-ct2, alignment/wav2vec2-large-960h,
+pyannote/speaker-diarization-3.1, llm}` — see `MASTER_PROMPT_MACOS.md`
+§5 Step B for exact file lists.
 
-## Usage Guidelines
+## Protocol
 
-- Use the controls in the Recorder Panel to start and stop audio recording.
-- The application will automatically transcribe the recorded audio and generate a summary.
-- Access the history directory to view past recordings and summaries.
-
-## Contribution
-
-Contributions are welcome! Please open an issue or submit a pull request for any enhancements or bug fixes.
-
-## License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
+stdin: `{"command":"PROCESS",...}` | PING | EXIT
+stdout: READY | STAGE | PROGRESS | ERROR | COMPLETE | BYE | PONG
+(stderr is diagnostics only — never parsed by the host)

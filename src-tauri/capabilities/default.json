@@ -6,18 +6,6 @@
   "permissions": [
     "core:default",
     "core:event:default",
-    "core:path:default",
-    "shell:allow-execute",
-    "shell:default",
-    {
-      "identifier": "shell:allow-spawn",
-      "allow": [
-        {
-          "name": "audio-processor",
-          "sidecar": true,
-          "args": true
-        }
-      ]
-    }
+    "core:path:default"
   ]
 }

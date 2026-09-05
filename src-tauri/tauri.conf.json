@@ -34,10 +34,9 @@
     "icon": [
       "icons/icon.png"
     ],
-    "externalBin": [
-      "binaries/audio-processor"
-    ],
-    "resources": [],
+    "resources": {
+      "../python-sidecar/dist/audio-processor-x86_64-apple-darwin/": "sidecar/"
+    },
     "macOS": {
       "minimumSystemVersion": "13.0"
     },

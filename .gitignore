@@ -26,5 +26,5 @@ Thumbs.db
 *.swp
 
 # --- Platform binaries (generate per-target; commit only source) ---
-src-tauri/binaries/
+src-tauri/target/
 /audio-processor-x86_64-apple-darwin.spec

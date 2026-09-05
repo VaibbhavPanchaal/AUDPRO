@@ -1,13 +1,24 @@
 # -*- mode: python ; coding: utf-8 -*-
-# PyInstaller --onedir build for the offline speech sidecar.
+# PyInstaller --onedir build for the offline speech sidecar — macOS Intel.
 # Output name matches the Tauri v2 externalBin triple convention:
-#   audio-processor-x86_64-pc-windows-msvc
+#   audio-processor-x86_64-apple-darwin
 #
-# Build (on a Windows x64 machine with the venv active):
-#   pyinstaller audio_sidecar.spec --noconfirm
+# Build (on this Mac, venv active):
+#   bash build-mac-intel.sh
+# or directly:
+#   .venv/bin/pyinstaller audio_sidecar_macos.spec --noconfirm
+#
+# Intel Macs have no CUDA: the pipeline runs CPU + INT8 (expected config).
+# macOS PyInstaller collects .dylibs automatically, but ctranslate2 /
+# llama_cpp / torch ship dylibs outside their packages, so we pull them in
+# explicitly (the counterpart of copy_windows_dlls.py on Windows).
 
 import os
-from PyInstaller.utils.hooks import collect_data_files, collect_submodules
+from PyInstaller.utils.hooks import (
+    collect_data_files,
+    collect_dynamic_libs,
+    collect_submodules,
+)
 
 project_root = os.path.dirname(os.path.abspath(SPEC))
 
@@ -33,11 +44,17 @@ if os.path.isdir(models_dir):
 datas += collect_data_files("whisperx")
 datas += collect_data_files("pyannote.audio")
 
+binaries = []
+for package in ("ctranslate2", "llama_cpp", "torch", "soundfile"):
+    try:
+        binaries += collect_dynamic_libs(package)
+    except Exception:
+        pass
 
 a = Analysis(
     ["sidecar_entry.py"],
     pathex=[project_root],
-    binaries=[],
+    binaries=binaries,
     datas=datas,
     hiddenimports=hiddenimports,
     hookspath=[],
@@ -56,7 +73,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name="audio-processor-x86_64-pc-windows-msvc",
+    name="audio-processor-x86_64-apple-darwin",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -75,5 +92,5 @@ coll = COLLECT(
     a.datas,
     strip=False,
     upx=False,
-    name="audio-processor-x86_64-pc-windows-msvc",
+    name="audio-processor-x86_64-apple-darwin",
 )

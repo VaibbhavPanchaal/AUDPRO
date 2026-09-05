@@ -44,21 +44,9 @@ Write-Host "==> Building sidecar with PyInstaller (onedir)"
 Write-Host "==> Copying GPU runtime DLLs into dist"
 & .venv\Scripts\python.exe copy_windows_dlls.py --dist-dir dist\audio-processor-x86_64-pc-windows-msvc
 
-# --- 7. Stage into the Tauri externalBin layout --------------------------------
-Write-Host "==> Staging sidecar for Tauri externalBin"
-$target = Join-Path $PSScriptRoot "..\src-tauri\binaries"
-New-Item -ItemType Directory -Force -Path $target | Out-Null
-
-# Tauri externalBin expects: binaries/audio-processor-x86_64-pc-windows-msvc.exe
-# PyInstaller produced: dist/audio-processor-x86_64-pc-windows-msvc/audio-processor-x86_64-pc-windows-msvc.exe
-# Tauri spawns the wrapper exe; the onedir payload must sit beside it.
-$distExe = Join-Path $PSScriptRoot "dist\audio-processor-x86_64-pc-windows-msvc"
-if (Test-Path $distExe) {
-    Copy-Item -Recurse -Force $distExe $target
-    Write-Host "Staged onedir distribution to $target"
-} else {
-    Write-Host "WARNING: dist directory not found; skip staging" -ForegroundColor Yellow
-}
-
+# --- 7. Done: the onedir dist stays in python-sidecar/dist/ -------------------
+# tauri.conf.json bundles it via `bundle.resources` ("sidecar/" under the
+# app's resource dir). Nothing is copied into src-tauri/binaries anymore.
 Write-Host ""
+Write-Host "SIDECAR READY: $PSScriptRoot\dist\audio-processor-x86_64-pc-windows-msvc"
 Write-Host "Next: cd ..\src-tauri && npm run tauri build" -ForegroundColor Green

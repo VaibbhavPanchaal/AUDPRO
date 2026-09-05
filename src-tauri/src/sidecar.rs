@@ -254,12 +254,33 @@ pub async fn process_audio(
         audio
     };
 
-    // Spawn in stdin-loop mode (no process args), then dispatch the
-    // PROCESS command as a line-delimited JSON message on stdin.
-    let command = app
-        .shell()
-        .sidecar("audio-processor")
-        .map_err(|error| format!("Unable to create sidecar command: {error}"))?;
+    // Resolve the frozen sidecar bundled via `bundle.resources`:
+    //   <resource_dir>/sidecar/<platform binary name>
+    // (onedir layout stays intact — PyInstaller's `_internal/` ships
+    // alongside the launcher inside the resource folder.)
+    let sidecar_name = if cfg!(target_os = "windows") {
+        "audio-processor-x86_64-pc-windows-msvc.exe"
+    } else {
+        "audio-processor-x86_64-apple-darwin"
+    };
+
+    let resource_dir = app
+        .path()
+        .resource_dir()
+        .map_err(|e| format!("Unable to resolve resource directory: {e}"))?;
+
+    let sidecar_path = resource_dir.join("sidecar").join(sidecar_name);
+
+    if !sidecar_path.is_file() {
+        return Err(format!(
+            "Frozen sidecar not found at {}. Build it first: \
+             cd python-sidecar && bash build-mac-intel.sh (macOS) or \
+             powershell -File build-windows.ps1 (Windows).",
+            sidecar_path.display()
+        ));
+    }
+
+    let command = app.shell().command(sidecar_path);
 
     let (mut events, child) = command
         .spawn()

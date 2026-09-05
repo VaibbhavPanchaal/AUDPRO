@@ -7,6 +7,9 @@
 #   (or by a one-time provisioning script run BEFORE deployment).
 
 # --- Transcription: WhisperX batched inference on CTranslate2 ------------
+# NOTE: matplotlib is a hard runtime import of recent whisperx versions;
+#       it must NOT be excluded from the PyInstaller build.
+matplotlib
 whisperx
 ctranslate2>=4.0.0
 
